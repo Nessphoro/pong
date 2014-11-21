@@ -1,0 +1,28 @@
+MULTIPLAYER PONG
+
+Vítor Mendonça
+Pavlo Malynin
+
+The project will consist of a 2-player pong game. It will use 2 sets of
+Arduinos, joysticks and LCD screens. The same game session will be displayed
+in both screens and each player will control their paddle using their
+joystick. When a player can't hit the ball, the opposite player wins a point. 
+The first player to score 5 points wins.
+
+We shouldn't have problems with syncronization between the two games because
+the delay between the arduinos is very low (<2 ms) and we'll set it up so that
+they communicate at 2 MiB / s. If that doesn't work we'll implemente TSS
+(Trailing State Synchronization) and that should take care of any extra issue.
+
+Milestones:
+
+1) Nov 22 - PADDLES: Make the paddles show up on the screen and have the players
+control them. 
+
+2) Nov 25 - SYNC SCREENS: The screens should be in sync, such that moving a paddle on one
+screen makes the paddle move on the other.
+
+3) Nov 28 - BALL: Code the ball. Make it react to the walls and the paddles.
+
+4) Nov 30 - KEEP SCORE: create a system to keep score of the game. Have it display on
+the screen game stats at the end.
