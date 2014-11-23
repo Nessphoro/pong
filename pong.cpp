@@ -2,6 +2,7 @@
 
 #include "paddle.h"
 #include "screen.h"
+#include "ball.h"
 
 
 // Define pins for the joystick
@@ -15,7 +16,7 @@ int restPosition;
 
 // size of delay in the main loop
 // determines speed of the game
-int speed = 25;
+int speed = 500;
 
 
 
@@ -28,6 +29,8 @@ int joystickRead()
 
 
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+
+
 // initialize paddles
 
 Paddle PlayerPaddle = {
@@ -44,6 +47,14 @@ Paddle EnemyPaddle = {
     2, // vertPosition; 2 pixels below the top
     RED};
 
+// create Ball object
+
+Ball ActiveBall = {
+    5, // size
+    WHITE, // colour
+    0, 0, 0, 0}; // position and velocity
+
+
 void quit()
 {
     tft.fillScreen(BLACK);
@@ -59,6 +70,7 @@ void setup()
     
     Serial.begin(9600);
 
+    randomSeed(analogRead(2)); //seeding the random function with an unused pin
 
     tft.initR(INITR_REDTAB);   // initialize a ST7735R chip, red tab
  
@@ -66,6 +78,8 @@ void setup()
 
     drawPaddle(&PlayerPaddle);
     drawPaddle(&EnemyPaddle);
+
+    initializeBall(&ActiveBall);
 
 
     // read horizontal and vertical rest position of the joystick
@@ -76,11 +90,9 @@ void loop()
 {
     delay(speed);
 
+    moveBall(&ActiveBall,&PlayerPaddle,&EnemyPaddle);
+
     movePaddle(&PlayerPaddle,joystickRead());
-    Serial.println("joystickRead: ");
-    Serial.println(joystickRead());
-    Serial.println("position");
-    Serial.println(PlayerPaddle.horzPosition);
 
     if (digitalRead(SEL) == LOW)
 	quit();
