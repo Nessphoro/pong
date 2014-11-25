@@ -3,13 +3,14 @@
 #include "paddle.h"
 #include "screen.h"
 #include "ball.h"
-
+#include "Client.h"
+#include "Server.h"
 
 // Define pins for the joystick
 #define VERT 0
 #define HORZ 1
 #define SEL 9
-
+#define SERVER_SEL 13
 
 // rest position of the paddle
 int restPosition;
@@ -75,14 +76,25 @@ void quit()
 
 void setup()
 {
-    pinMode(VERT, INPUT);
-    pinMode(HORZ, INPUT);
+    pinMode(SERVER_SEL,INPUT_PULLUP);
     pinMode(SEL, INPUT_PULLUP);
     digitalWrite(SEL, HIGH); //turn on internal resistor
     
     Serial.begin(9600);
+    Serial3.begin(1000000);
 
-    randomSeed(analogRead(2)); //seeding the random function with an unused pin
+    if(digitalRead(SERVER_SEL)==HIGH)
+    {
+        Serial.print("Server mode");
+	   server();
+    }
+    else
+    {
+        Serial.print("Client mode");
+	   client();
+    }
+    Serial.print("Hello world");
+    //randomSeed(analogRead(2)); //seeding the random function with an unused pin
 
     tft.initR(INITR_REDTAB);   // initialize a ST7735R chip, red tab
     
