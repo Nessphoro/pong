@@ -26,9 +26,10 @@ void eraseBallTrail(int oldHPosition, int oldVPosition, Ball * ball)
     // dimensions of the trail
     int trailHPosition, trailVPosition, trailWidth, trailHeight;
 
-    /* if either of the velocity components is greater than the ball size,
+    /* if the ball has moved a good amount,
      * the trail and the ball don't overlap */
-    if ( (ball->vertVelocity >= ball->size) || (ball->horzVelocity >= ball->size) )
+    if ( (abs(oldHPosition - ball->horzPosition) > ball->size) || 
+	    (abs(oldVPosition - ball->vertPosition) > ball->size) )
 	tft.fillRect(oldHPosition,oldVPosition,ball->size,ball->size,BLACK);
 
     /* if the ball is going down, the trail
