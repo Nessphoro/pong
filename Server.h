@@ -91,7 +91,7 @@ void server()
 		}
 
 		uint32_t end = micros();
-		uing32_t serverStart = readLong3();
+		uint32_t serverStart = readLong3();
 		uint32_t serverEnd = readLong3();
 
 		delayTime += (end - start) - (serverEnd - serverStart);
@@ -99,7 +99,7 @@ void server()
 	}
 
 	//Average
-	delay /= 16;
+	delayTime /= 16;
 	offset /= 16;
 
 	Serial.print("Done syncronizing. Delay: ");
@@ -108,6 +108,20 @@ void server()
 	Serial.println(offset);
 
 	//Send "start game", game will start in 100 000 micro seconds
+	//Generate a new random
+	uint32_t seed = 0;
+	for(int i=0;i<32;i++)
+	{
+		seed |= analogRead(15) << i;
+		delayMicroseconds(1000);
+	}
+	randomSeed(seed);
+	Serial3.write('R');
+	sendLong3(seed);
+	Serial3.flush();
+
+	delay(200);
 	Serial3.write('G');
+	Serial3.flush();
 	delay(100);
 }

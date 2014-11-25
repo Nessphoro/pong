@@ -51,7 +51,7 @@ void client()
 	//ACK once again
 
 	Serial3.write('A');
-	delayMicroseconds(1000);
+	delay(100);
 	int32_t delayTime = 0, offset = 0;
 
 	//Now, we must syncronize clocks
@@ -66,7 +66,7 @@ void client()
 		}
 
 		uint32_t end = micros();
-		uing32_t serverStart = readLong3();
+		uint32_t serverStart = readLong3();
 		uint32_t serverEnd = readLong3();
 
 		delayTime += (end - start) - (serverEnd - serverStart);
@@ -95,12 +95,22 @@ void client()
 	Serial.print(", Offset: ");
 	Serial.println(offset);
 
-	//Wait for game start
-	while (Serial3.read() != 'G')
+	//Wait for random seed
+	while (Serial3.available() < 5)
 	{
 
 	}
 
-	uint32_t timeToStart = 100 - (delay / 2) / 1000;
+	Serial3.read();// should be 'R'
+	uint32_t seed = readLong3();
+	randomSeed(seed);
+
+	while(Serial3.read() != 'G')
+	{
+
+	}
+
+	//Sync game starts
+	uint32_t timeToStart = 100 - (delayTime / 2) / 1000;
 	delay(timeToStart);
 }
