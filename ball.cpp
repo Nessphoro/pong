@@ -7,6 +7,12 @@ const int maxVelocity = 20;
 
 extern Adafruit_ST7735 tft;
 
+// boundaries of movement for the ball
+const int leftEdge = 0;
+const int rightEdge = srcWidth;
+const int redCourt = 2 + paddleHeight; // as high as the red paddle
+const int blueCourt = srcHeight - 2 - paddleHeight; // as high as the blue paddle
+
 
 void drawBall(Ball * ball)
 {
@@ -68,22 +74,94 @@ void eraseBallTrail(int oldHPosition, int oldVPosition, Ball * ball)
 
 	tft.fillRect(trailHPosition,trailVPosition,trailWidth,trailHeight,BLACK);
     }
+
+    Serial.print(" trailHPosition ");
+    Serial.println(trailHPosition);
+    Serial.print(" trailVPosition ");
+    Serial.print(trailVPosition);
+    Serial.print(" trailWidth ");
+    Serial.println(trailWidth);
+    Serial.print(" trailHeight ");
+    Serial.println(trailHeight);
 }
 
 
-char moveBall(Ball * ball, Paddle * player, Paddle * enemy)
+/* detect if the ball collided with a surface
+ * and adjust its position and velocity accordingly*/
+void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner)
+{
+    int paddleLeftEdge, paddleRightEdge;
+
+    //coordinates of the top of the blue paddle
+    //and bottom of the red paddle
+    int blueTop = blue->vertPosition;
+    int redBottom = red->vertPosition + paddleHeight;
+    
+
+    if (ball->horzPosition < leftEdge)
+    {
+	ball->horzPosition = leftEdge;
+	ball->horzVelocity = (-(ball->horzVelocity));
+    }
+    else if (ball->horzPosition + ball->size > rightEdge)
+    {
+	ball->horzPosition = rightEdge - ball->size;
+	ball->horzVelocity = (-(ball->horzVelocity));
+    }
+
+    *winner = 0;
+    if (ball->vertPosition < redBottom)
+    {
+	paddleLeftEdge = red->horzPosition;
+	paddleRightEdge = red->horzPosition + red->size;
+
+	if (((ball->horzPosition + ball->size) > paddleLeftEdge) && (ball->horzPosition < paddleRightEdge))
+	    // bounce if the ball hit the red paddle
+	{
+	    ball->vertPosition = redBottom;
+	    ball->vertVelocity = (-(ball->vertVelocity));
+	}
+	else
+	    *winner = 'b';
+    }
+    else if (ball->vertPosition + ball->size > blueTop)
+    {
+	paddleLeftEdge = blue->horzPosition;
+	paddleRightEdge = blue->horzPosition + blue->size;
+
+	if ((ball->horzPosition + ball->size > paddleLeftEdge) && (ball->horzPosition < paddleRightEdge))
+	    // bounce if the ball hit the blue paddle
+	{
+	    Serial.println();
+	    Serial.println("HIT PADDLE!");
+	    Serial.println();
+	    ball->vertPosition = blueTop - ball->size;
+	    ball->vertVelocity = (-(ball->vertVelocity));
+	}
+	else
+	    *winner = 'r';
+    }
+}
+
+/* moves the ball
+ * returns a character indicating the winner of the round
+ * or 0 if there's no winner */
+char moveBall(Ball * ball, Paddle * blue, Paddle * red)
 {
     int oldHPosition = ball->horzPosition;
     int oldVPosition = ball->vertPosition;
-
+    char winner;
+    
     ball->horzPosition += ball->horzVelocity;
     ball->vertPosition += ball->vertVelocity;
+
+    bounce(ball,red,blue,&winner); 
 
     eraseBallTrail(oldHPosition,oldVPosition,ball);
 
     drawBall(ball);
 
-    return 1;
+    return winner;
 }
 
 void initializeBall(Ball * ball)

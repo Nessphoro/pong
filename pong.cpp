@@ -16,6 +16,8 @@ int restPosition;
 
 // size of delay in the main loop
 // determines speed of the game
+
+// the game is currently slowed down for testing purposes
 int speed = 500;
 
 
@@ -55,6 +57,16 @@ Ball ActiveBall = {
     0, 0, 0, 0}; // position and velocity
 
 
+void start()
+{
+    tft.fillScreen(BLACK);
+
+    drawPaddle(&PlayerPaddle);
+    drawPaddle(&EnemyPaddle);
+
+    initializeBall(&ActiveBall);
+}
+
 void quit()
 {
     tft.fillScreen(BLACK);
@@ -73,26 +85,27 @@ void setup()
     randomSeed(analogRead(2)); //seeding the random function with an unused pin
 
     tft.initR(INITR_REDTAB);   // initialize a ST7735R chip, red tab
- 
-    tft.fillScreen(BLACK);
-
-    drawPaddle(&PlayerPaddle);
-    drawPaddle(&EnemyPaddle);
-
-    initializeBall(&ActiveBall);
-
-
+    
     // read horizontal and vertical rest position of the joystick
     restPosition = analogRead(HORZ);
+
+    start();
+ 
 }
 
 void loop()
 {
     delay(speed);
 
-    moveBall(&ActiveBall,&PlayerPaddle,&EnemyPaddle);
+    int result = moveBall(&ActiveBall,&PlayerPaddle,&EnemyPaddle);
+
+    if (result != 0)
+	start();
 
     movePaddle(&PlayerPaddle,joystickRead());
+
+    drawPaddle(&PlayerPaddle);
+    drawPaddle(&EnemyPaddle);
 
     if (digitalRead(SEL) == LOW)
 	quit();
