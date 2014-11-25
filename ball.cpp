@@ -127,7 +127,7 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner)
 	    ball->vertPosition = redBottom;
 	    ball->vertVelocity = (-(ball->vertVelocity));
 	    // transfer some of the paddle's velocity to the ball
-	    ball->horzVelocity += paddle->horzVelocity * percentage /100;
+	    ball->horzVelocity += red->horzVelocity * percentage /100;
 	}
 	else
 	    *winner = 'b';
@@ -143,7 +143,7 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner)
 	    ball->vertPosition = blueTop - ball->size;
 	    ball->vertVelocity = (-(ball->vertVelocity));
 	    // transfer some of the paddle's velocity to the ball
-	    ball->horzVelocity += paddle->horzVelocity * percentage /100;
+	    ball->horzVelocity += blue->horzVelocity * percentage /100;
 	}
 	else
 	    *winner = 'r';
