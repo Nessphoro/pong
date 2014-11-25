@@ -4,6 +4,11 @@
 
 const int maxVelocity = 20;
 
+// percentage of the paddle's
+// velocity that will be transferred
+// to the ball
+const int percentage = 80;
+
 
 extern Adafruit_ST7735 tft;
 
@@ -121,6 +126,8 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner)
 	{
 	    ball->vertPosition = redBottom;
 	    ball->vertVelocity = (-(ball->vertVelocity));
+	    // transfer some of the paddle's velocity to the ball
+	    ball->horzVelocity += paddle->horzVelocity * percentage /100;
 	}
 	else
 	    *winner = 'b';
@@ -133,15 +140,22 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner)
 	if ((ball->horzPosition + ball->size > paddleLeftEdge) && (ball->horzPosition < paddleRightEdge))
 	    // bounce if the ball hit the blue paddle
 	{
-	    Serial.println();
-	    Serial.println("HIT PADDLE!");
-	    Serial.println();
 	    ball->vertPosition = blueTop - ball->size;
 	    ball->vertVelocity = (-(ball->vertVelocity));
+	    // transfer some of the paddle's velocity to the ball
+	    ball->horzVelocity += paddle->horzVelocity * percentage /100;
 	}
 	else
 	    *winner = 'r';
     }
+
+    //check if the ball's velocity
+    //is below the maximum
+    if (ball->horzVelocity > maxVelocity)
+	ball->horzVelocity = maxVelocity;
+    else if (ball->vertVelocity > maxVelocity)
+	ball->vertVelocity = maxVelocity;
+
 }
 
 /* moves the ball

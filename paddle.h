@@ -17,6 +17,8 @@ typedef struct
     int vertPosition; //vertical position
 
     int colour;
+
+    int horzVelocity;
 } Paddle;
 
 

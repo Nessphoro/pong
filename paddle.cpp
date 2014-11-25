@@ -18,13 +18,19 @@ void drawPaddle(Paddle * paddle)
 void movePaddle(Paddle * paddle, int disp)
 {
     int paddleMaxPosition = maxPosition - paddle->size;
+    paddle->horzVelocity = disp;
 
     // make sure paddle doesn't move beyond edges of the screen
     if ((paddle->horzPosition + disp) <= minPosition)
+    {
 	disp = minPosition - (paddle->horzPosition);
-    else
-	if ((paddle->horzPosition + disp) >= paddleMaxPosition)
-	    disp = paddleMaxPosition - (paddle->horzPosition);
+	paddle->horzVelocity = 0;
+    }
+    else if ((paddle->horzPosition + disp) >= paddleMaxPosition)
+    {
+	disp = paddleMaxPosition - (paddle->horzPosition);
+	paddle->horzVelocity = 0;
+    }
 
     // do nothing if there's no displacement
     if (disp == 0)
