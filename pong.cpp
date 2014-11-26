@@ -15,7 +15,7 @@ int restPosition;
 // determines speed of the game
 
 // the game is currently slowed down for testing purposes
-int speed = 500;
+int speed = 20;
 
 // displacement of the enemy joystick, read from the serial
 int enemyDisp = 0;
@@ -38,7 +38,7 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
 // initialize paddles
 
-Paddle RedPaddle = {
+Paddle BluePaddle = {
     paddleWidth, //size
     srcWidth/2 - paddleWidth/2, //position; place in middle of screen
     1, //player
@@ -46,7 +46,7 @@ Paddle RedPaddle = {
     BLUE,
     0}; // velocity
 
-Paddle BluePaddle = {
+Paddle RedPaddle = {
     paddleWidth, //size
     srcWidth/2 - paddleWidth/2, //position; place in middle of screen
     0, //not player
@@ -76,7 +76,25 @@ void setup()
     Serial.begin(9600);
     Serial3.begin(1000000);
 
-    if(digitalRead(SERVER_SEL)==HIGH)
+    tft.initR(INITR_REDTAB);   // initialize a ST7735R chip, red tab
+    tft.fillScreen(0);
+    tft.setCursor(srcWidth/2 - 30, srcHeight/2);
+    tft.print("Connecting");
+    isClient=digitalRead(SERVER_SEL)==LOW;
+    tft.setCursor(srcWidth/2 - 35,srcHeight/2 + 20);
+    if(isClient)
+    {
+        tft.setTextColor(BLUE);
+        tft.print("You are blue");
+    }
+    else
+    {
+        tft.setTextColor(RED);
+        tft.print("You are red");
+    }
+
+
+    if(!isClient)
     {
         Serial.print("Server mode");
 	   server();
@@ -86,10 +104,11 @@ void setup()
         Serial.print("Client mode");
 	       client();
     }
+
     Serial.print("Hello world");
     //randomSeed(analogRead(2)); //seeding the random function with an unused pin
 
-    tft.initR(INITR_REDTAB);   // initialize a ST7735R chip, red tab
+    
     
     // read horizontal and vertical rest position of the joystick
     restPosition = analogRead(HORZ);
@@ -106,26 +125,29 @@ void loop()
     delay(speed);
 
     int result = moveBall(&ActiveBall,&BluePaddle,&RedPaddle);
-
+    //int result = 0;
     if (result)
     {
-    	finishRound(result, &redTotal, &blueTotal);
+    	finishRound(result, redTotal, blueTotal);
     	start(&RedPaddle,&BluePaddle,&ActiveBall);
     }
 
     //exchange joystick data
+   
+    int jostickInput = joystickRead();
+    sendLong3(jostickInput);
+    while(Serial3.available() < 4);
     enemyDisp = readLong3();
-    sendLong3(joystickRead());
 
 
     if (isClient)
     {
-    	movePaddle(&BluePaddle,joystickRead());
+    	movePaddle(&BluePaddle,jostickInput);
     	movePaddle(&RedPaddle,enemyDisp);
     }
     else
     {
-    	movePaddle(&RedPaddle,joystickRead());
+    	movePaddle(&RedPaddle, jostickInput);
     	movePaddle(&BluePaddle,enemyDisp);
     }
 

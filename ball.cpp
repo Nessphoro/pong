@@ -2,12 +2,12 @@
 #include "ball.h"
 
 
-const int maxVelocity = 20;
+const int maxVelocity = 5;
 
 // percentage of the paddle's
 // velocity that will be transferred
 // to the ball
-const int percentage = 80;
+const int percentage = 20;
 
 
 extern Adafruit_ST7735 tft;
@@ -35,52 +35,53 @@ void eraseBallTrail(int oldHPosition, int oldVPosition, Ball * ball)
      * the trail and the ball don't overlap */
     if ( (abs(oldHPosition - ball->horzPosition) > ball->size) || 
 	    (abs(oldVPosition - ball->vertPosition) > ball->size) )
-	tft.fillRect(oldHPosition,oldVPosition,ball->size,ball->size,BLACK);
+	   tft.fillRect(oldHPosition,oldVPosition,ball->size,ball->size,BLACK);
 
     /* if the ball is going down, the trail
      * is partially above it */
     if ( ball->vertVelocity > 0 )
     {
-	trailHPosition = oldHPosition;
-	trailVPosition = oldVPosition;
-	trailWidth = ball->size;
-	trailHeight = ball->vertPosition - oldVPosition; //height = vertical displacement
+    	trailHPosition = oldHPosition;
+    	trailVPosition = oldVPosition;
+    	trailWidth = ball->size;
+    	trailHeight = ball->vertPosition - oldVPosition; //height = vertical displacement
 
-	tft.fillRect(trailHPosition,trailVPosition,trailWidth,trailHeight,BLACK);
+    	tft.fillRect(trailHPosition-5,trailVPosition-5,trailWidth+10,trailHeight+10,BLACK);
     }
     /* if the ball is going up, the trail is partially below it */
     else if ( ball->vertVelocity < 0 )
     {
-	trailHPosition = oldHPosition;
-	trailVPosition = ball->vertPosition + ball->size; //immediately below the ball
-	trailWidth = ball->size;
-	trailHeight = oldVPosition - ball->vertPosition; //height = vertical displacement
+    	trailHPosition = oldHPosition;
+    	trailVPosition = ball->vertPosition + ball->size; //immediately below the ball
+    	trailWidth = ball->size;
+    	trailHeight = oldVPosition - ball->vertPosition; //height = vertical displacement
 
-	tft.fillRect(trailHPosition,trailVPosition,trailWidth,trailHeight,BLACK);
+    	tft.fillRect(trailHPosition-5,trailVPosition-5,trailWidth+10,trailHeight+10,BLACK);
     }
 
     /* if the ball is going to the right, the trail
      * is partially to the left of it */
     if ( ball->horzVelocity > 0 )
     {
-	trailHPosition = oldHPosition;
-	trailVPosition = oldVPosition;
-	trailWidth = ball->horzPosition - oldHPosition; //width = horizontal displacement
-	trailHeight = ball->size;
+    	trailHPosition = oldHPosition;
+    	trailVPosition = oldVPosition;
+    	trailWidth = ball->horzPosition - oldHPosition; //width = horizontal displacement
+    	trailHeight = ball->size;
 
-	tft.fillRect(trailHPosition,trailVPosition,trailWidth,trailHeight,BLACK);
+    	tft.fillRect(trailHPosition-5,trailVPosition-5,trailWidth+10,trailHeight+10,BLACK);
     }
     /* if the ball is going to the left, the trail is partially to the right of it */
     else if ( ball->horzVelocity < 0 )
     {
-	trailHPosition = ball->horzPosition + ball->size; //immediately  to the right the ball
-	trailVPosition = oldVPosition;
-	trailWidth = oldHPosition - ball->horzPosition; //width = horizontal displacement
-	trailHeight = ball->size;
+    	trailHPosition = ball->horzPosition + ball->size; //immediately  to the right the ball
+    	trailVPosition = oldVPosition;
+    	trailWidth = oldHPosition - ball->horzPosition; //width = horizontal displacement
+    	trailHeight = ball->size;
 
-	tft.fillRect(trailHPosition,trailVPosition,trailWidth,trailHeight,BLACK);
+    	tft.fillRect(trailHPosition-5,trailVPosition-5,trailWidth+10,trailHeight+10,BLACK);
     }
 
+    /*
     Serial.print(" trailHPosition ");
     Serial.println(trailHPosition);
     Serial.print(" trailVPosition ");
@@ -89,6 +90,7 @@ void eraseBallTrail(int oldHPosition, int oldVPosition, Ball * ball)
     Serial.println(trailWidth);
     Serial.print(" trailHeight ");
     Serial.println(trailHeight);
+    */
 }
 
 
@@ -102,59 +104,75 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner)
     //and bottom of the red paddle
     int blueTop = blue->vertPosition;
     int redBottom = red->vertPosition + paddleHeight;
-    
+
+    /*
+    Serial.println("Blue top 1:");
+    Serial.println(blueTop);
+
+    Serial.println("Red bottom:");
+    Serial.println(redBottom);
+    */
 
     if (ball->horzPosition < leftEdge)
     {
-	ball->horzPosition = leftEdge;
-	ball->horzVelocity = (-(ball->horzVelocity));
+    	ball->horzPosition = leftEdge;
+    	ball->horzVelocity = (-(ball->horzVelocity));
     }
-    else if (ball->horzPosition + ball->size > rightEdge)
+    else if ((ball->horzPosition + ball->size )> rightEdge)
     {
-	ball->horzPosition = rightEdge - ball->size;
-	ball->horzVelocity = (-(ball->horzVelocity));
+    	ball->horzPosition = rightEdge - ball->size;
+    	ball->horzVelocity = (-(ball->horzVelocity));
     }
 
     *winner = 0;
     if (ball->vertPosition < redBottom)
     {
-	paddleLeftEdge = red->horzPosition;
-	paddleRightEdge = red->horzPosition + red->size;
+    	paddleLeftEdge = red->horzPosition;
+    	paddleRightEdge = red->horzPosition + red->size;
 
-	if (((ball->horzPosition + ball->size) > paddleLeftEdge) && (ball->horzPosition < paddleRightEdge))
-	    // bounce if the ball hit the red paddle
-	{
-	    ball->vertPosition = redBottom;
-	    ball->vertVelocity = (-(ball->vertVelocity));
-	    // transfer some of the paddle's velocity to the ball
-	    ball->horzVelocity += red->horzVelocity * percentage /100;
-	}
-	else
-	    *winner = 'b';
+    	if (((ball->horzPosition + ball->size) > paddleLeftEdge) && (ball->horzPosition < paddleRightEdge))
+    	    // bounce if the ball hit the red paddle
+    	{
+    	    ball->vertPosition = redBottom;
+    	    ball->vertVelocity = (-(ball->vertVelocity));
+    	    // transfer some of the paddle's velocity to the ball
+    	    ball->horzVelocity += red->horzVelocity * percentage /100;
+    	}
+    	else
+    	    *winner = 'b';
     }
     else if (ball->vertPosition + ball->size > blueTop)
     {
-	paddleLeftEdge = blue->horzPosition;
-	paddleRightEdge = blue->horzPosition + blue->size;
+    	paddleLeftEdge = blue->horzPosition;
+    	paddleRightEdge = blue->horzPosition + blue->size;
 
-	if ((ball->horzPosition + ball->size > paddleLeftEdge) && (ball->horzPosition < paddleRightEdge))
-	    // bounce if the ball hit the blue paddle
-	{
-	    ball->vertPosition = blueTop - ball->size;
-	    ball->vertVelocity = (-(ball->vertVelocity));
-	    // transfer some of the paddle's velocity to the ball
-	    ball->horzVelocity += blue->horzVelocity * percentage /100;
-	}
-	else
-	    *winner = 'r';
+    	if ((ball->horzPosition + ball->size > paddleLeftEdge) && (ball->horzPosition < paddleRightEdge))
+    	    // bounce if the ball hit the blue paddle
+    	{
+    	    ball->vertPosition = blueTop - ball->size;
+    	    ball->vertVelocity = (-(ball->vertVelocity));
+    	    // transfer some of the paddle's velocity to the ball
+    	    ball->horzVelocity += blue->horzVelocity * percentage /100;
+    	}
+    	else
+    	    *winner = 'r';
     }
 
+    int totalVelocity = ball->horzVelocity *ball->horzVelocity  + ball->vertVelocity*ball->vertVelocity;
+    if(totalVelocity > (maxVelocity * maxVelocity))
+    {
+        double length = sqrt(totalVelocity);
+        length = ((double) maxVelocity) / length;
+        ball->horzVelocity *= length;
+        ball->vertVelocity *= length;
+
+    }
     //check if the ball's velocity
     //is below the maximum
     if (ball->horzVelocity > maxVelocity)
-	ball->horzVelocity = maxVelocity;
+	   ball->horzVelocity = maxVelocity;
     else if (ball->vertVelocity > maxVelocity)
-	ball->vertVelocity = maxVelocity;
+	   ball->vertVelocity = maxVelocity;
 
 }
 
@@ -170,7 +188,12 @@ char moveBall(Ball * ball, Paddle * blue, Paddle * red)
     ball->horzPosition += ball->horzVelocity;
     ball->vertPosition += ball->vertVelocity;
 
+    //Serial.print("Vel Y:");
+    //Serial.println(ball->vertVelocity);
     bounce(ball,red,blue,&winner); 
+    //Serial.print("Vel Y2:");
+    //Serial.println(ball->vertVelocity);
+
 
     eraseBallTrail(oldHPosition,oldVPosition,ball);
 

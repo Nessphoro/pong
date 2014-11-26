@@ -24,9 +24,9 @@ DEFINES := ${DEFINITIONS:%=-D%}
 # Define your compiler flags. Remember to `+=` the rule.
 #CFLAGS += -Wall -Werror -std=c99
 #CXXFLAGS += -Wall -Werror
-CPPFLAGS += $(DEFINES) 
+CPPFLAGS += $(DEFINES) -Wall 
 
 # override the default optimization levels here
-# CPP_OPTIMIZE = -O0
-# C_OPTIMIZE = -O0
-# LD_OPTIMIZE = -O0
+CPP_OPTIMIZE = -O3
+C_OPTIMIZE = -O3
+LD_OPTIMIZE = -O3
