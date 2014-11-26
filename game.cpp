@@ -28,49 +28,45 @@ void finishRound(char result, short * redTotal, short * blueTotal)
     // winner screen
     if (*redTotal >= roundsToWin)
     {
-	tft.setTextColor(WHITE);
-	tft.print("GAME FINISHED\n");
-	tft.print("WINNER:\n");
-	tft.setTextColor(RED);
-	tft.print("RED");
+    	tft.setTextColor(WHITE);
+    	tft.print("GAME FINISHED\n");
+    	tft.print("WINNER:\n");
+    	tft.setTextColor(RED);
+    	tft.print("RED");
 
-	*redTotal = *blueTotal = 0;
+    	*redTotal = *blueTotal = 0;
 
-	// keep the frame until the user presses the button
-	while (digitalRead(SEL) == HIGH)
-	    ;
+    	// keep the frame until the user presses the button
+    	while (digitalRead(SEL) == HIGH);
 
-	return;
+    	return;
     }
     else if (*blueTotal >= roundsToWin);
     {
-	tft.setTextColor(WHITE);
-	tft.print("GAME FINISHED\n");
-	tft.print("WINNER:\n");
-	tft.setTextColor(BLUE);
-	tft.print("BLUE");
+    	tft.setTextColor(WHITE);
+    	tft.print("GAME FINISHED\n");
+    	tft.print("WINNER:\n");
+    	tft.setTextColor(BLUE);
+    	tft.print("BLUE");
 
-	*redTotal = *blueTotal = 0;
+    	*redTotal = *blueTotal = 0;
 
-	// keep the frame until the user presses the button
-	while (digitalRead(SEL) == HIGH)
-	    ;
+    	// keep the frame until the user presses the button
+    	while (digitalRead(SEL) == HIGH);
 
-	return;
+    	return;
     }
-
-
 
     // blue result
     tft.setTextColor(BLUE);
-    tft.print("%d",blueTotal);
+    tft.print(*blueTotal);
 
     tft.setTextColor(WHITE);
     tft.print(" - ");
 
     // red result
     tft.setTextColor(RED);
-    tft.print("%d",redTotal);
+    tft.print(*redTotal);
     // keep the frame until the user presses the button
     while (digitalRead(SEL) == HIGH)
 	;

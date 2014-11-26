@@ -1,3 +1,4 @@
+#pragma once
 #include "paddle.h"
 #include "screen.h"
 

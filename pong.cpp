@@ -65,7 +65,7 @@ Ball ActiveBall = {
 
 
 
-bool client;
+bool isClient;
 
 void setup()
 {
@@ -84,7 +84,7 @@ void setup()
     else
     {
         Serial.print("Client mode");
-	   client();
+	       client();
     }
     Serial.print("Hello world");
     //randomSeed(analogRead(2)); //seeding the random function with an unused pin
@@ -93,11 +93,11 @@ void setup()
     
     // read horizontal and vertical rest position of the joystick
     restPosition = analogRead(HORZ);
-    client = digitalRead(SERVER_SEL) == LOW;
+    isClient = digitalRead(SERVER_SEL) == LOW;
 
     redTotal = blueTotal = 0;
 
-    start(&RedPaddle,&BluePaddle);
+    start(&RedPaddle,&BluePaddle, &ActiveBall);
  
 }
 
@@ -109,8 +109,8 @@ void loop()
 
     if (result)
     {
-	finishRound(result, &redTotal, &blueTotal);
-	start(&RedPaddle,&BluePaddle,&ActiveBall);
+    	finishRound(result, &redTotal, &blueTotal);
+    	start(&RedPaddle,&BluePaddle,&ActiveBall);
     }
 
     //exchange joystick data
@@ -118,15 +118,15 @@ void loop()
     sendLong3(joystickRead());
 
 
-    if (client)
+    if (isClient)
     {
-	movePaddle(&BluePaddle,joystickRead());
-	movePaddle(&RedPaddle,enemyDisp);
+    	movePaddle(&BluePaddle,joystickRead());
+    	movePaddle(&RedPaddle,enemyDisp);
     }
     else
     {
-	movePaddle(&RedPaddle,joystickRead());
-	movePaddle(&BluePaddle,enemyDisp);
+    	movePaddle(&RedPaddle,joystickRead());
+    	movePaddle(&BluePaddle,enemyDisp);
     }
 
 
