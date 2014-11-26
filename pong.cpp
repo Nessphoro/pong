@@ -5,12 +5,8 @@
 #include "ball.h"
 #include "Client.h"
 #include "Server.h"
+#include "game.h"
 
-// Define pins for the joystick
-#define VERT 0
-#define HORZ 1
-#define SEL 9
-#define SERVER_SEL 13
 
 // rest position of the paddle
 int restPosition;
@@ -20,6 +16,12 @@ int restPosition;
 
 // the game is currently slowed down for testing purposes
 int speed = 500;
+
+// displacement of the enemy joystick, read from the serial
+int enemyDisp = 0;
+
+// scores of each player
+short redTotal, blueTotal;
 
 
 
@@ -36,19 +38,21 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
 // initialize paddles
 
-Paddle PlayerPaddle = {
+Paddle RedPaddle = {
     paddleWidth, //size
     srcWidth/2 - paddleWidth/2, //position; place in middle of screen
     1, //player
     srcHeight-2-paddleHeight, //vertPosition;  2 pixels above the bottom
-    BLUE};
+    BLUE,
+    0}; // velocity
 
-Paddle EnemyPaddle = {
+Paddle BluePaddle = {
     paddleWidth, //size
     srcWidth/2 - paddleWidth/2, //position; place in middle of screen
     0, //not player
     2, // vertPosition; 2 pixels below the top
-    RED};
+    RED,
+    0}; // velocity
 
 // create Ball object
 
@@ -58,21 +62,10 @@ Ball ActiveBall = {
     0, 0, 0, 0}; // position and velocity
 
 
-void start()
-{
-    tft.fillScreen(BLACK);
 
-    drawPaddle(&PlayerPaddle);
-    drawPaddle(&EnemyPaddle);
 
-    initializeBall(&ActiveBall);
-}
 
-void quit()
-{
-    tft.fillScreen(BLACK);
-}
-
+bool client;
 
 void setup()
 {
@@ -100,8 +93,11 @@ void setup()
     
     // read horizontal and vertical rest position of the joystick
     restPosition = analogRead(HORZ);
+    client = digitalRead(SERVER_SEL) == LOW;
 
-    start();
+    redTotal = blueTotal = 0;
+
+    start(&RedPaddle,&BluePaddle);
  
 }
 
@@ -109,15 +105,33 @@ void loop()
 {
     delay(speed);
 
-    int result = moveBall(&ActiveBall,&PlayerPaddle,&EnemyPaddle);
+    int result = moveBall(&ActiveBall,&BluePaddle,&RedPaddle);
 
-    if (result != 0)
-	start();
+    if (result)
+    {
+	finishRound(result, &redTotal, &blueTotal);
+	start(&RedPaddle,&BluePaddle,&ActiveBall);
+    }
 
-    movePaddle(&PlayerPaddle,joystickRead());
+    //exchange joystick data
+    enemyDisp = readLong3();
+    sendLong3(joystickRead());
 
-    drawPaddle(&PlayerPaddle);
-    drawPaddle(&EnemyPaddle);
+
+    if (client)
+    {
+	movePaddle(&BluePaddle,joystickRead());
+	movePaddle(&RedPaddle,enemyDisp);
+    }
+    else
+    {
+	movePaddle(&RedPaddle,joystickRead());
+	movePaddle(&BluePaddle,enemyDisp);
+    }
+
+
+    drawPaddle(&RedPaddle);
+    drawPaddle(&BluePaddle);
 
     if (digitalRead(SEL) == LOW)
 	quit();

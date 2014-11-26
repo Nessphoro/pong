@@ -20,6 +20,12 @@
 #define RED 0x001F
 #define WHITE 0xFFFF
 
+// Define pins for the joystick
+#define VERT 0
+#define HORZ 1
+#define SEL 9
+#define SERVER_SEL 13
+
 
 
 //dimensions of the screen
