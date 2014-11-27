@@ -23,6 +23,15 @@ int enemyDisp = 0;
 // scores of each player
 short redTotal, blueTotal;
 
+// maximum velocity of the ball
+int maxVelocity;
+
+int initialTime;
+int numBalls;
+
+//accumulator for the main loop
+int acc;
+
 
 
 //read joystick signal
@@ -56,10 +65,14 @@ Paddle RedPaddle = {
 
 // create Ball object
 
-Ball ActiveBall = {
+Ball InitialBall = {
     5, // size
     WHITE, // colour
     0, 0, 0, 0}; // position and velocity
+
+Ball ActiveBall[3];
+
+
 
 
 
@@ -80,6 +93,7 @@ void setup()
     tft.fillScreen(0);
     tft.setCursor(srcWidth/2 - 30, srcHeight/2);
     tft.print("Connecting");
+    isClient = 0;
     isClient=digitalRead(SERVER_SEL)==LOW;
     tft.setCursor(srcWidth/2 - 35,srcHeight/2 + 20);
     if(isClient)
@@ -106,31 +120,55 @@ void setup()
     }
 
     Serial.print("Hello world");
-    //randomSeed(analogRead(2)); //seeding the random function with an unused pin
 
+    // initialize ball vector
+    for (int i=0; i<3; ++i)
+        ActiveBall[i] = InitialBall;
     
     
     // read horizontal and vertical rest position of the joystick
     restPosition = analogRead(HORZ);
-    isClient = digitalRead(SERVER_SEL) == LOW;
 
     redTotal = blueTotal = 0;
 
-    start(&RedPaddle,&BluePaddle, &ActiveBall);
+    initialTime = millis();
+
+    numBalls = 1;
+
+    start(&RedPaddle,&BluePaddle, &ActiveBall[0]);
  
 }
 
 void loop()
 {
+    /* increase maximum ball velocity
+     * by 5 pixels/s every 5 s*/
+    acc = ((millis() - initialTime) / (5*1000));
+    if (acc % 5 == 0)
+        maxVelocity += 5;
+
+    // put another ball in the field each 20 seconds
+    if (acc % 20 == 0)
+        // maximum 3
+        if (numBalls < 3)
+            numBalls++;
+
     delay(speed);
 
-    int result = moveBall(&ActiveBall,&BluePaddle,&RedPaddle);
-    //int result = 0;
-    if (result)
-    {
-    	finishRound(result, redTotal, blueTotal);
-    	start(&RedPaddle,&BluePaddle,&ActiveBall);
-    }
+    // result for each ball
+    int result[3];
+
+    for (int i=0; i<numBalls; ++i)
+        result[i] = moveBall(&ActiveBall[i],&BluePaddle,&RedPaddle,maxVelocity);
+
+    for (int i=0; i<numBalls; ++i)
+        if (result[i])
+        {
+            finishRound(result[i], redTotal, blueTotal);
+            start(&RedPaddle,&BluePaddle,&ActiveBall[0]);
+            initialTime = millis();
+            numBalls = 1;
+        }
 
     //exchange joystick data
    

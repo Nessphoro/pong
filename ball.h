@@ -18,10 +18,10 @@ typedef struct
 
 void drawBall(Ball * ball);
 
-void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner);
+void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelocity);
 
 void eraseBallTrail(int oldHPosition, int oldVPosition, Ball * ball);
 
-char moveBall(Ball * ball, Paddle * blue, Paddle * red);
+char moveBall(Ball * ball, Paddle * blue, Paddle * red, int maxVelocity);
 
 void initializeBall(Ball * ball);
