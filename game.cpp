@@ -30,11 +30,6 @@ void countdown()
     tft.setTextSize(1);
 }
 
-void quit()
-{
-    tft.fillScreen(BLACK);
-}
-
 void finishRound(char result, short& redTotal, short& blueTotal)
 {
     switch(result)

@@ -15,12 +15,10 @@ extern Adafruit_ST7735 tft;
 // boundaries of movement for the ball
 const int leftEdge = 0;
 const int rightEdge = srcWidth;
-const int redCourt = 2 + paddleHeight; // as high as the red paddle
-const int blueCourt = srcHeight - 2 - paddleHeight; // as high as the blue paddle
-
 
 void drawBall(Ball * ball)
 {
+    
     tft.fillRect(ball->horzPosition, ball->vertPosition,
 	    ball->size, ball->size, 
 	    ball->colour);
@@ -31,58 +29,6 @@ void eraseBallTrail(int oldHPosition, int oldVPosition, Ball * ball)
     // dimensions of the trail
     //int trailHPosition, trailVPosition, trailWidth, trailHeight;
     tft.fillRect(oldHPosition,oldVPosition,ball->size,ball->size,BLACK);
-
-  
-//    /* if the ball has moved a good amount,
-//     * the trail and the ball don't overlap */
-//    if ( (abs(oldHPosition - ball->horzPosition) > ball->size) || 
-//	    (abs(oldVPosition - ball->vertPosition) > ball->size) )
-//	   tft.fillRect(oldHPosition,oldVPosition,ball->size,ball->size,BLACK);
-//
-//    /* if the ball is going down, the trail
-//     * is partially above it */
-//    if ( ball->vertVelocity > 0 )
-//    {
-//    	trailHPosition = oldHPosition;
-//    	trailVPosition = oldVPosition;
-//    	trailWidth = ball->size;
-//    	trailHeight = ball->vertPosition - oldVPosition; //height = vertical displacement
-//
-//    	tft.fillRect(trailHPosition-5,trailVPosition-5,trailWidth+10,trailHeight+10,BLACK);
-//    }
-//    /* if the ball is going up, the trail is partially below it */
-//    else if ( ball->vertVelocity < 0 )
-//    {
-//    	trailHPosition = oldHPosition;
-//    	trailVPosition = ball->vertPosition + ball->size; //immediately below the ball
-//    	trailWidth = ball->size;
-//    	trailHeight = oldVPosition - ball->vertPosition; //height = vertical displacement
-//
-//    	tft.fillRect(trailHPosition-5,trailVPosition-5,trailWidth+10,trailHeight+10,BLACK);
-//    }
-//
-//    /* if the ball is going to the right, the trail
-//     * is partially to the left of it */
-//    if ( ball->horzVelocity > 0 )
-//    {
-//    	trailHPosition = oldHPosition;
-//    	trailVPosition = oldVPosition;
-//    	trailWidth = ball->horzPosition - oldHPosition; //width = horizontal displacement
-//    	trailHeight = ball->size;
-//
-//    	tft.fillRect(trailHPosition-5,trailVPosition-5,trailWidth+10,trailHeight+10,BLACK);
-//    }
-//    /* if the ball is going to the left, the trail is partially to the right of it */
-//    else if ( ball->horzVelocity < 0 )
-//    {
-//    	trailHPosition = ball->horzPosition + ball->size; //immediately  to the right the ball
-//    	trailVPosition = oldVPosition;
-//    	trailWidth = oldHPosition - ball->horzPosition; //width = horizontal displacement
-//    	trailHeight = ball->size;
-//
-//    	tft.fillRect(trailHPosition-5,trailVPosition-5,trailWidth+10,trailHeight+10,BLACK);
-//    }
-
 }
 
 
@@ -97,13 +43,6 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelo
     int blueTop = blue->vertPosition;
     int redBottom = red->vertPosition + paddleHeight;
 
-    /*
-    Serial.println("Blue top 1:");
-    Serial.println(blueTop);
-
-    Serial.println("Red bottom:");
-    Serial.println(redBottom);
-    */
 
     if (ball->horzPosition < leftEdge)
     {
@@ -150,7 +89,7 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelo
     	    *winner = 'r';
     }
 
-    int totalVelocity = ball->horzVelocity *ball->horzVelocity  + ball->vertVelocity*ball->vertVelocity;
+    double totalVelocity = ball->horzVelocity *ball->horzVelocity  + ball->vertVelocity*ball->vertVelocity;
     if(totalVelocity > (maxVelocity * maxVelocity))
     {
         double length = sqrt(totalVelocity);

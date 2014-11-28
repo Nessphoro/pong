@@ -15,7 +15,7 @@ int restPosition;
 // determines speed of the game
 
 // the game is currently slowed down for testing purposes
-int speed = 20;
+int speed = 16;
 
 // displacement of the enemy joystick, read from the serial
 int enemyDisp = 0;
@@ -27,10 +27,7 @@ short redTotal, blueTotal;
 int maxVelocity = 5;
 
 long initialTime=0;
-int numBalls=1;
 
-//accumulator for the main loop
-long acc=0;
 
 
 
@@ -65,12 +62,10 @@ Paddle RedPaddle = {
 
 // create Ball object
 
-Ball InitialBall = {
+Ball ActiveBall = {
     5, // size
     WHITE, // colour
     0, 0, 0, 0}; // position and velocity
-
-Ball ActiveBall[3];
 
 
 
@@ -122,10 +117,6 @@ void setup()
     Serial.print("Hello world");
 
     countdown();
-
-    // initialize ball vector
-    for (int i=0; i<3; ++i)
-        ActiveBall[i] = InitialBall;
     
     
     // read horizontal and vertical rest position of the joystick
@@ -135,9 +126,9 @@ void setup()
 
     initialTime = millis();
 
-    numBalls = 1;
 
-    start(&RedPaddle,&BluePaddle, &ActiveBall[0]);
+
+    start(&RedPaddle,&BluePaddle, &ActiveBall);
  
 }
 
@@ -145,26 +136,21 @@ void loop()
 {
     /* increase maximum ball velocity
      * by 5 pixels/s every 5 s*/
-    acc = ((millis() - initialTime));
-   if (acc % 5000 == 0)
+    long acc = ((millis() - initialTime));
+    if (acc % 5000 == 0)
        maxVelocity += 5;
 
-    delay(speed);
 
     // result for each ball
-    int result[3];
+    int result = moveBall(&ActiveBall,&BluePaddle,&RedPaddle,maxVelocity);
 
-    for (int i=0; i<numBalls; ++i)
-        result[i] = moveBall(&ActiveBall[i],&BluePaddle,&RedPaddle,maxVelocity);
-
-    for (int i=0; i<numBalls; ++i)
-        if (result[i])
-        {
-            finishRound(result[i], redTotal, blueTotal);
-            start(&RedPaddle,&BluePaddle,&ActiveBall[0]);
-            initialTime = millis();
-            numBalls = 1;
-        }
+    if (result)
+    {
+        finishRound(result, redTotal, blueTotal);
+        start(&RedPaddle,&BluePaddle,&ActiveBall);
+        initialTime = millis();
+        
+    }
 
     //exchange joystick data
    
@@ -189,7 +175,7 @@ void loop()
     drawPaddle(&RedPaddle);
     drawPaddle(&BluePaddle);
 
-    if (digitalRead(SEL) == LOW)
-	quit();
 
+
+    delay(speed);
 }

@@ -4,7 +4,6 @@
 #include "ball.h"
 
 
-void quit();
 
 void finishRound(char result, short &redTotal, short &blueTotal);
 
