@@ -47,6 +47,12 @@ void client()
 		}
 	}
 	Serial.println("Done negotiating.");
+	while(Serial3.available())
+	{
+		Serial3.read();
+	}
+	delay(500);
+		
 	//Ok, we'have the server key now
 	//ACK once again
 

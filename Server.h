@@ -61,7 +61,9 @@ void server()
 			}
 		}
 	}
-
+	while(Serial3.available())
+		Serial3.read();
+	delay(500);
 	Serial.println("Syncronizing");
 	int32_t delayTime = 0, offset = 0;
 

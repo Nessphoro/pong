@@ -11,8 +11,8 @@ typedef struct
     int horzPosition;
     int vertPosition;
     // horizontal and vertical components of velocity (pixels/loop cycle)
-    int horzVelocity;
-    int vertVelocity;
+    double horzVelocity;
+    double vertVelocity;
 } Ball;
 
 

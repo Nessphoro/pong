@@ -7,7 +7,7 @@ const int initialVelocity = 5;
 // percentage of the paddle's
 // velocity that will be transferred
 // to the ball
-const int percentage = 20;
+const int percentage = 30;
 
 
 extern Adafruit_ST7735 tft;
@@ -30,7 +30,7 @@ void eraseBallTrail(int oldHPosition, int oldVPosition, Ball * ball)
 {
     // dimensions of the trail
     //int trailHPosition, trailVPosition, trailWidth, trailHeight;
-    tft.fillRect(oldHPosition-5,oldVPosition-5,ball->size+10,ball->size+10,BLACK);
+    tft.fillRect(oldHPosition,oldVPosition,ball->size,ball->size,BLACK);
 
   
 //    /* if the ball has moved a good amount,

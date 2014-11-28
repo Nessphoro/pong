@@ -24,13 +24,13 @@ int enemyDisp = 0;
 short redTotal, blueTotal;
 
 // maximum velocity of the ball
-int maxVelocity;
+int maxVelocity = 5;
 
-int initialTime;
-int numBalls;
+long initialTime=0;
+int numBalls=1;
 
 //accumulator for the main loop
-int acc;
+long acc=0;
 
 
 
@@ -143,15 +143,9 @@ void loop()
 {
     /* increase maximum ball velocity
      * by 5 pixels/s every 5 s*/
-    acc = ((millis() - initialTime) / (5*1000));
-    if (acc % 5 == 0)
-        maxVelocity += 5;
-
-    // put another ball in the field each 20 seconds
-    if (acc % 20 == 0)
-        // maximum 3
-        if (numBalls < 3)
-            numBalls++;
+    acc = ((millis() - initialTime));
+   if (acc % 5000 == 0)
+       maxVelocity += 5;
 
     delay(speed);
 
