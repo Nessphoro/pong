@@ -17,6 +17,19 @@ void start(Paddle * RedPaddle, Paddle * BluePaddle, Ball * ActiveBall)
     initializeBall(ActiveBall);
 }
 
+void countdown()
+{
+    for(int i=0;i<5;i++)
+    {
+        tft.fillScreen(BLACK);
+        tft.setTextSize(4);
+        tft.setCursor(srcWidth/2 - 10, srcHeight/2-10);
+        tft.print(5-i);
+        delay(1000);
+    }
+    tft.setTextSize(1);
+}
+
 void quit()
 {
     tft.fillScreen(BLACK);

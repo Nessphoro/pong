@@ -121,6 +121,8 @@ void setup()
 
     Serial.print("Hello world");
 
+    countdown();
+
     // initialize ball vector
     for (int i=0; i<3; ++i)
         ActiveBall[i] = InitialBall;

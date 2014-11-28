@@ -9,3 +9,5 @@ void quit();
 void finishRound(char result, short &redTotal, short &blueTotal);
 
 void start(Paddle * RedPaddle, Paddle * BluePaddle, Ball * ActiveBall);
+
+void countdown();
