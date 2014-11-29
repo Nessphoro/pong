@@ -13,8 +13,6 @@ int restPosition;
 
 // size of delay in the main loop
 // determines speed of the game
-
-// the game is currently slowed down for testing purposes
 int speed = 16;
 
 // displacement of the enemy joystick, read from the serial
@@ -31,7 +29,8 @@ long initialTime=0;
 
 
 
-//read joystick signal
+/* read joystick signal and convert
+ * it to a velocity format (pixels/s)*/
 int joystickRead() 
 { 
     return (restPosition - analogRead(HORZ))/100; 
@@ -85,11 +84,25 @@ void setup()
     Serial3.begin(1000000);
 
     tft.initR(INITR_REDTAB);   // initialize a ST7735R chip, red tab
+
+    // place text cursor in the middle of the screen
     tft.fillScreen(0);
     tft.setCursor(srcWidth/2 - 30, srcHeight/2);
     tft.print("Connecting");
-    isClient = 0;
+
+
+    // the pin SERVER_SEL will determine
+    // if the Arduino will act in Server mode
+    // or Client Mode
     isClient=digitalRead(SERVER_SEL)==LOW;
+
+
+    /* the player will control the blue paddle
+     * if on Client mode and the red paddle if
+     * on Server mode*/
+
+    /* display on screen which paddle 
+     * the player is controlling*/
     tft.setCursor(srcWidth/2 - 35,srcHeight/2 + 20);
     if(isClient)
     {
@@ -103,18 +116,21 @@ void setup()
     }
 
 
+    /* print status messages to Serial
+     * for testing and maintenance
+     * purposes */
     if(!isClient)
     {
         Serial.print("Server mode");
-	   server();
+        server();
     }
     else
     {
         Serial.print("Client mode");
-	       client();
+        client();
     }
 
-    Serial.print("Hello world");
+    Serial.print("Connection successful");
 
     countdown();
     
@@ -125,8 +141,6 @@ void setup()
     redTotal = blueTotal = 0;
 
     initialTime = millis();
-
-
 
     start(&RedPaddle,&BluePaddle, &ActiveBall);
  
@@ -141,25 +155,34 @@ void loop()
        maxVelocity += 5;
 
 
-    // result for each ball
+    // move the ball and check there is winner for the round
     int result = moveBall(&ActiveBall,&BluePaddle,&RedPaddle,maxVelocity);
 
     if (result)
     {
         finishRound(result, redTotal, blueTotal);
+        // start a new round once it returns from results screen
         start(&RedPaddle,&BluePaddle,&ActiveBall);
         initialTime = millis();
-        
     }
 
     //exchange joystick data
    
+    // take the displacement of the joystick
+    // and send it to the other Arduino
     int jostickInput = joystickRead();
     sendLong3(jostickInput);
+
+    // wait for all 4 bytes of information
+    // to come through the serial
     while(Serial3.available() < 4);
+
+    // receive the displacement of the 
+    // enemy's joystick
     enemyDisp = readLong3();
 
 
+    // move paddles
     if (isClient)
     {
     	movePaddle(&BluePaddle,jostickInput);
@@ -172,6 +195,7 @@ void loop()
     }
 
 
+    // re-draw paddles
     drawPaddle(&RedPaddle);
     drawPaddle(&BluePaddle);
 

@@ -18,16 +18,16 @@ const int rightEdge = srcWidth;
 
 void drawBall(Ball * ball)
 {
-    
+    //the ball is a square with side "ball->size"
     tft.fillRect(ball->horzPosition, ball->vertPosition,
 	    ball->size, ball->size, 
 	    ball->colour);
 }
 
+/* erase the ball trail by painting a black square
+ * on the screen where the ball used to be*/
 void eraseBallTrail(int oldHPosition, int oldVPosition, Ball * ball)
 {
-    // dimensions of the trail
-    //int trailHPosition, trailVPosition, trailWidth, trailHeight;
     tft.fillRect(oldHPosition,oldVPosition,ball->size,ball->size,BLACK);
 }
 
@@ -44,6 +44,7 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelo
     int redBottom = red->vertPosition + paddleHeight;
 
 
+    // verify if ball hit one of the side edge of the screen
     if (ball->horzPosition < leftEdge)
     {
     	ball->horzPosition = leftEdge;
@@ -55,6 +56,9 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelo
     	ball->horzVelocity = (-(ball->horzVelocity));
     }
 
+    // verify if the ball reached the top or bottom
+    // of the screen and change the winner variable
+    // accordingly
     *winner = 0;
     if (ball->vertPosition < redBottom)
     {
@@ -70,7 +74,7 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelo
     	    ball->horzVelocity += red->horzVelocity * percentage /100;
     	}
     	else
-    	    *winner = 'b';
+    	    *winner = 'b'; // Winner is the blue paddle
     }
     else if (ball->vertPosition + ball->size > blueTop)
     {
@@ -86,9 +90,11 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelo
     	    ball->horzVelocity += blue->horzVelocity * percentage /100;
     	}
     	else
-    	    *winner = 'r';
+    	    *winner = 'r'; // Winner is the red paddle
     }
 
+    // make sure that the speed (length of velocity vector) is not greater than MaxVelocity
+    // find speed from the 2 velocity components using Pythagoras
     double totalVelocity = ball->horzVelocity *ball->horzVelocity  + ball->vertVelocity*ball->vertVelocity;
     if(totalVelocity > (maxVelocity * maxVelocity))
     {
@@ -98,12 +104,6 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelo
         ball->vertVelocity *= length;
 
     }
-    //check if the ball's velocity
-    //is below the maximum
-    if (ball->horzVelocity > maxVelocity)
-	   ball->horzVelocity = maxVelocity;
-    else if (ball->vertVelocity > maxVelocity)
-	   ball->vertVelocity = maxVelocity;
 
 }
 
@@ -112,19 +112,20 @@ void bounce(Ball * ball, Paddle * red, Paddle * blue, char * winner, int maxVelo
  * or 0 if there's no winner */
 char moveBall(Ball * ball, Paddle * blue, Paddle * red,int maxVelocity)
 {
+    // save previous position of the ball to erase the trail
     int oldHPosition = ball->horzPosition;
     int oldVPosition = ball->vertPosition;
+
     char winner;
     
+    // change the ball's position
+    // according to its velocity vectors
     ball->horzPosition += ball->horzVelocity;
     ball->vertPosition += ball->vertVelocity;
 
-    //Serial.print("Vel Y:");
-    //Serial.println(ball->vertVelocity);
+    // verify if the ball hit something
+    // or someone won the round
     bounce(ball,red,blue,&winner,maxVelocity); 
-    //Serial.print("Vel Y2:");
-    //Serial.println(ball->vertVelocity);
-
 
     eraseBallTrail(oldHPosition,oldVPosition,ball);
 
@@ -139,7 +140,7 @@ void initializeBall(Ball * ball)
     ball->horzPosition = srcWidth/2 - ball->size/2;
     ball->vertPosition = srcHeight/2 - ball->size/2; 
 
-    // initial horz velocity will range from -(maxVelocity/2) to +(maxVelocity/2)
+    // initial horz velocity will range from -(initialVelocity/2) to +(initialVelocity/2)
     ball->horzVelocity = initialVelocity/2 - random(initialVelocity);
 
     //initial vert velocity is always (initialVelocity/2) towards the blue player (down)

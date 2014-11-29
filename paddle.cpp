@@ -23,18 +23,18 @@ void movePaddle(Paddle * paddle, int disp)
     // make sure paddle doesn't move beyond edges of the screen
     if ((paddle->horzPosition + disp) <= minPosition)
     {
-	disp = minPosition - (paddle->horzPosition);
-	paddle->horzVelocity = 0;
+        disp = minPosition - (paddle->horzPosition);
+        paddle->horzVelocity = 0;
     }
     else if ((paddle->horzPosition + disp) >= paddleMaxPosition)
     {
-	disp = paddleMaxPosition - (paddle->horzPosition);
-	paddle->horzVelocity = 0;
+        disp = paddleMaxPosition - (paddle->horzPosition);
+        paddle->horzVelocity = 0;
     }
 
     // do nothing if there's no displacement
     if (disp == 0)
-	return;
+        return;
 
 
     // move and re-draw paddle
@@ -42,19 +42,19 @@ void movePaddle(Paddle * paddle, int disp)
     drawPaddle(paddle);
 
     // erase paddle trail
-    
+
     int trailX; // position of the trail
     int trailLength; // length of trail
 
     if (disp < 0) // moved left
     {
-	trailX = (paddle->horzPosition) + (paddle->size); // right side
-	trailLength = (-disp); // abs value of displacement
+        trailX = (paddle->horzPosition) + (paddle->size); // right side
+        trailLength = (-disp); // abs value of displacement
     }
     else // moved right
     {
-	trailX = (paddle->horzPosition) - disp; // left side
-	trailLength = (disp); // displacement
+        trailX = (paddle->horzPosition) - disp; // left side
+        trailLength = (disp); // displacement
     }
 
     tft.fillRect(trailX,paddle->vertPosition,trailLength,paddleHeight,BLACK);
