@@ -64,3 +64,13 @@ In each round, every 5 seconds, the ball's maximum velocity increases, to keep r
 lasting too long.
 
 
+File layout
+------------------------------------------------------
+
+ball.cpp - Ball physics
+paddle.cpp - Paddle specification and behaviour
+game.cpp - Game scorekeeping and score screens
+Client.cpp - Networking functions for the client
+Server.cpp - Networking functions for the server
+Utility.cpp - Networking functions common to server and client
+screen.h - Constant definitions for the screen, such as size
