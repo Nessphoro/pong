@@ -175,6 +175,7 @@ void loop()
 
     // wait for all 4 bytes of information
     // to come through the serial
+    //Acts as lock-step syncronizer
     while(Serial3.available() < 4);
 
     // receive the displacement of the 

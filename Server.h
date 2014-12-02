@@ -18,7 +18,7 @@ void server()
 			{	
 				Serial.read();
 				Serial.println("Initiating connection");
-				Serial3.write('A');
+				Serial3.write('A'); //ACK
 
 				Serial3.flush();
 
@@ -61,8 +61,10 @@ void server()
 			}
 		}
 	}
+	//Clear cache
 	while(Serial3.available())
 		Serial3.read();
+	//Give time to the other arduino
 	delay(500);
 	Serial.println("Syncronizing");
 	int32_t delayTime = 0, offset = 0;
@@ -109,20 +111,24 @@ void server()
 	Serial.print(", Offset: ");
 	Serial.println(offset);
 
-	//Send "start game", game will start in 100 000 micro seconds
+	
 	//Generate a new random
 	uint32_t seed = 0;
 	for(int i=0;i<32;i++)
 	{
 		seed |= analogRead(15) << i;
-		delayMicroseconds(1000);
+		delayMicroseconds(1000); //Give a chance for the value to change
 	}
-	randomSeed(seed);
-	Serial3.write('R');
+
+	randomSeed(seed); //Set our seed
+	
+	Serial3.write('R'); //Send the seed
 	sendLong3(seed);
 	Serial3.flush();
 
-	delay(200);
+	delay(200); //Give time for the client to react
+
+	//Send "start game", game will start in 100 000 micro seconds
 	Serial3.write('G');
 	Serial3.flush();
 	delay(100);
