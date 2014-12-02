@@ -36,6 +36,7 @@ void countdown()
 /* end round, display score
  * and declare a winner if
  * there is one*/
+
 void finishRound(char result, short& redTotal, short& blueTotal)
 {
     // increment score of the winner
